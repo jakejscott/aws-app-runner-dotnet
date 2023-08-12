@@ -1,5 +1,27 @@
 # aws app runner dotnet
 
+Install CDK cli
+
+```
+npm install -g aws-cdk
+```
+
+Install dependencies
+
+```
+npm install
+```
+
+Create a `.env` file and add the following variables:
+
+```
+AWS_ACCOUNT=<AWS ACCOUNT ID>
+AWS_REGION=<AWS REGION>
+SERVICE=apprunner
+STAGE=ft-0001  # feature, dev, staging or prod.
+VERSION=0.0.1
+```
+
 Deploy ECR Stack
 
 ```
