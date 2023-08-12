@@ -1,0 +1,8 @@
+services:
+  webapp:
+    image: "${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERVICE}-${STAGE}-ecr-webapp-repository:${VERSION}"
+    build:
+      context: ./
+      dockerfile: ./src/WebApp/Dockerfile
+    ports:
+      - 80:8080
