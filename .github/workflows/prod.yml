@@ -1,0 +1,65 @@
+permissions:
+  contents: read
+  id-token: write
+on:
+  pull_request:
+    branches:
+      - main
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: false
+name: dev
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      SERVICE: ${{ vars.SERVICE }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT }}
+      VERSION: ${{ github.sha }}
+      STAGE: prod
+    name: build
+    steps:
+      - uses: actions/checkout@v3
+      # - uses: actions/setup-dotnet@v3
+      #   with:
+      #     dotnet-version: 7.0.100
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm ci
+
+      # - run: npm run unit
+      # - run: npm run build
+
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/github-actions
+          role-duration-seconds: 900
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: deploy ecr
+        run: npx cdk deploy ${{ env.SERVICE }}-${{ env.STAGE }}-ecr --require-approval never
+
+      - name: login ecr
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+
+      - name: push ecr
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ env.SERVICE }}-${{ env.STAGE }}-ecr-webapp-repository
+          VERSION: ${{ github.sha }}
+        run: |
+          docker build . -t $REGISTRY/$REPOSITORY:$VERSION -f ./src/WebApp/Dockerfile
+          docker push $REGISTRY/$REPOSITORY:$VERSION
+
+      - name: deploy app
+        run: npx cdk deploy ${{ env.SERVICE }}-${{ env.STAGE }}-app --require-approval never
+
+      # - run: npm run integration
+      # - run: npm run e2e
