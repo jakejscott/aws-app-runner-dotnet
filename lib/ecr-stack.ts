@@ -22,7 +22,7 @@ export class EcrStack extends cdk.Stack {
           rulePriority: 1,
           description: "Remove if more than 3 images",
           tagStatus: ecr.TagStatus.ANY,
-          maxImageCount: 3,
+          maxImageAge: cdk.Duration.days(90),
         },
       ],
       removalPolicy: cdk.RemovalPolicy.DESTROY,
