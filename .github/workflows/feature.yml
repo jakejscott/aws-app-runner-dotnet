@@ -59,6 +59,5 @@ jobs:
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$VERSION ./src/WebApp/
           docker push $REGISTRY/$REPOSITORY:$VERSION
-
       # - run: npm run integration
       # - run: npm run e2e
