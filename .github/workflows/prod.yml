@@ -6,7 +6,7 @@ on:
     branches:
       - main
 concurrency:
-  group: ${{ github.head_ref }}
+  group: prod
   cancel-in-progress: false
 name: dev
 jobs:
