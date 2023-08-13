@@ -61,5 +61,8 @@ jobs:
           docker build . -t $REGISTRY/$REPOSITORY:$VERSION -f ./src/WebApp/Dockerfile
           docker push $REGISTRY/$REPOSITORY:$VERSION
 
+      - name: deploy app
+        run: npx cdk deploy ${{ env.SERVICE }}-${{ env.STAGE }}-app --require-approval never
+
       # - run: npm run integration
       # - run: npm run e2e
