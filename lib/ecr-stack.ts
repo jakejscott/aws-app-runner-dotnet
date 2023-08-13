@@ -27,7 +27,7 @@ export class EcrStack extends cdk.Stack {
       ],
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteImages: true,
-      imageTagMutability: ecr.TagMutability.IMMUTABLE,
+      imageTagMutability: ecr.TagMutability.MUTABLE,
     });
   }
 }

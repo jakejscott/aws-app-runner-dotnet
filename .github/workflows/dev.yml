@@ -2,22 +2,23 @@ permissions:
   contents: read
   id-token: write
 on:
-  pull_request:
+  push:
     branches:
       - dev
 concurrency:
   group: ${{ github.head_ref }}
   cancel-in-progress: false
-name: feature
+name: dev
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: feature
+    environment: dev
     env:
       SERVICE: ${{ vars.SERVICE }}
       AWS_REGION: ${{ vars.AWS_REGION }}
       AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT }}
       VERSION: ${{ github.sha }}
+      STAGE: dev
     name: build
     steps:
       - uses: actions/checkout@v3
@@ -30,10 +31,6 @@ jobs:
 
       - run: npm ci
 
-      - name: detect stage
-        id: vars
-        run: |
-          echo "STAGE=$(echo ${{github.head_ref}} | sed -r 's/[^a-z0-9-]/-/gi' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
       # - run: npm run unit
       # - run: npm run build
 
