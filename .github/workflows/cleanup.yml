@@ -1,0 +1,38 @@
+permissions:
+  contents: read
+  id-token: write
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
+name: cleanup
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: feature
+    env:
+      SERVICE: ${{ vars.SERVICE }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT }}
+      VERSION: ${{ github.sha }}
+    name: build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - name: Run detect stage
+        id: vars
+        run: |
+          echo "STAGE=$(echo ${{github.head_ref}} | sed -r 's/[^a-z0-9-]/-/gi' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/github-actions
+          role-duration-seconds: 900
+          aws-region: ${{ env.AWS_REGION }}
+      - name: destroy app
+        run: npx cdk destroy ${{ env.SERVICE }}-${{ env.STAGE }}-app --force
+      - name: destroy ecr
+        run: npx cdk destroy ${{ env.SERVICE }}-${{ env.STAGE }}-ecr --force
