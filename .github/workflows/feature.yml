@@ -17,6 +17,7 @@ jobs:
       SERVICE: ${{ vars.SERVICE }}
       AWS_REGION: ${{ vars.AWS_REGION }}
       AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT }}
+      VERSION: ${{ github.sha }}
     name: build
     steps:
       - uses: actions/checkout@v3
