@@ -58,7 +58,8 @@ jobs:
           REPOSITORY: ${{ env.SERVICE }}-${{ env.STAGE }}-ecr-webapp-repository
           VERSION: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$VERSION ./src/WebApp/
+          docker build . -t $REGISTRY/$REPOSITORY:$VERSION -f ./src/WebApp/Dockerfile
           docker push $REGISTRY/$REPOSITORY:$VERSION
+
       # - run: npm run integration
       # - run: npm run e2e
